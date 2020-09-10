@@ -135,21 +135,23 @@ class ChatSessionMessageView(generics.GenericAPIView):
 
 class MessageReceived(APIView):
     def put(self, request, *args, **kwargs):
-
+        channels.Received(request.data['chat_session'], request.data['sender'])
         messages = ChatSessionMessage.objects.filter(
             Q(chat_session=request.data['chat_session']) | Q(received=False))
         for message in messages:
             message.received = True
             message.save()
-        channels.Received(request.data['chat_session'], request.data['sender'])
         return Response('success', status=status.HTTP_201_CREATED)
 
 
 class MessageSeen(APIView):
     def put(self, request, *args, **kwargs):
+        channels.Seen(request.data['chat_session'], request.data['sender'])
+
         messages = ChatSessionMessage.objects.filter(
             Q(chat_session=request.data['chat_session']) | Q(seen=False))
         for message in messages:
+            message.received = True
             message.seen = True
             message.save()
         return Response('success', status=status.HTTP_201_CREATED)
