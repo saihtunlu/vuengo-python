@@ -1,28 +1,54 @@
 from .models import Post, Like, Comment, CommentReplies, CommentLike
 from django.shortcuts import get_object_or_404
-from rest_framework import status
-from rest_framework import generics
+from rest_framework import status, filters
+from rest_framework import generics, pagination
 from rest_framework.response import Response
-from .serializers import PostSerializers, LikeSerializers, CommentSerializers, CommentRepliesSerializers, CommentLikeSerializers
+from .serializers import (PostSerializers, LikeSerializers,
+                          CommentSerializers, CommentRepliesSerializers, CommentLikeSerializers)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import APIView
+from django.core.mail import send_mail
 
 # Create your views here.
 
 
-class PostsView(generics.RetrieveAPIView):
+class PostsView(generics.ListAPIView):
     permission_classes = (IsAuthenticated,)
     queryset = Post.objects.order_by('created_at').reverse()
+    serializer_class = PostSerializers
+    pagination_class = pagination.PageNumberPagination
+
+    # def get(self, request, *args, **kwargs):
+    #     queryset = self.get_queryset()
+    #     serializer = PostSerializers(queryset, many=True)
+    #     return Response(serializer.data)
+
+
+class FilterPosts(generics.ListAPIView):
+    permission_classes = (IsAuthenticated,)
+    queryset = Post.objects.all()
+    serializer_class = PostSerializers
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['content', 'user__username']
+
+
+class SendEmail(generics.RetrieveAPIView):
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        serializer = PostSerializers(queryset, many=True)
-        return Response(serializer.data)
+        send_mail(
+            'Subject here',
+            'Here is the message.',
+            'venomarcer@gmail.com',
+            ['venomarcer14996@gmail.com'],
+            fail_silently=False,
+        )
+        return Response('Success', status=status.HTTP_201_CREATED)
 
 
-class CreatePost(APIView):
+class Post_Detail(APIView):
     parser_classes = [MultiPartParser, FormParser]
     permission_classes = (IsAuthenticated,)
 
@@ -35,6 +61,30 @@ class CreatePost(APIView):
             return Response(post_serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(post_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, *args, **kwargs):
+        data = request.data
+        id = kwargs['id']
+        post = Post.objects.get(user=self.request.user, id=id)
+        post_serializer = PostSerializers(post, data=data)
+        if post_serializer.is_valid():
+            post_serializer.save()
+            return Response(post_serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(post_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self, request, *args, **kwargs):
+        id = kwargs['id']
+        post = get_object_or_404(
+            Post, id=id)
+        post_serializer = PostSerializers(post, many=False)
+        return Response(post_serializer.data, status=status.HTTP_201_CREATED)
+
+    def delete(self, request, *args, **kwargs):
+        id = kwargs['id']
+        post = Post.objects.get(user=self.request.user, id=id)
+        post.delete()
+        return Response('Success', status=status.HTTP_201_CREATED)
 
 
 class AuthPost(generics.RetrieveAPIView):

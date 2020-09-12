@@ -1,9 +1,11 @@
 from django.urls import path
-from .views import PostsView, CreatePost, AuthPost, RemovePost, AddComment, RemoveComment, AddLike, RemoveLike, AddCommentReply, RemoveCommentReply, AddCommentLike, RemoveCommentLike
+from .views import (PostsView, FilterPosts, Post_Detail, AuthPost, RemovePost, AddComment, RemoveComment, SendEmail,
+                    AddLike, RemoveLike, AddCommentReply, RemoveCommentReply, AddCommentLike, RemoveCommentLike)
 
 urlpatterns = [
     path('posts/', PostsView.as_view(), name='posts_view'),
-    path('create-post/', CreatePost.as_view(), name='create_post'),
+    path('search-posts', FilterPosts.as_view()),
+    path('post/<id>', Post_Detail.as_view()),
     path('delete-post/', RemovePost.as_view(), name='remove_post'),
     path('my-posts/', AuthPost.as_view(), name='my_posts'),
     path('comment/', AddComment.as_view()),
@@ -14,4 +16,5 @@ urlpatterns = [
     path('remove-comment-reply/', RemoveCommentReply.as_view()),
     path('like-comment/', AddCommentLike.as_view()),
     path('unlike-comment/', RemoveCommentLike.as_view()),
+    path('send-email/', SendEmail.as_view()),
 ]
