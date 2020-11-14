@@ -6,6 +6,7 @@ urlpatterns = [
     path('posts/', PostsView.as_view(), name='posts_view'),
     path('search-posts', FilterPosts.as_view()),
     path('post/<id>', Post_Detail.as_view()),
+    path('post/', Post_Detail.as_view()),
     path('delete-post/', RemovePost.as_view(), name='remove_post'),
     path('my-posts/', AuthPost.as_view(), name='my_posts'),
     path('comment/', AddComment.as_view()),

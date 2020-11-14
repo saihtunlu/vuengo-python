@@ -64,16 +64,25 @@ MIDDLEWARE = [
 CORS_ORIGIN_WHITELIST = [
     "http://localhost:8080",
     "http://127.0.0.1:8080",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    'http://192.168.100.4:8080',
+    'http://192.168.100.4'
 ]
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8080",
     "http://127.0.0.1:8080",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    'http://192.168.100.4:8080',
+    'http://192.168.100.4'
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "localhost",
     "127.0.0.1",
+    '192.168.100.4'
 ]
 CORS_ALLOW_HEADERS = list(default_headers) + [
     'contenttype',
@@ -111,7 +120,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'vuengo',
-        'USER': 'saihtunlu',
+        'USER': 'postgres',
         'PASSWORD': 'zaihtunlu',
     }
 }
@@ -160,6 +169,7 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
 
     ),
+    'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAdminUser', ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 1,
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']

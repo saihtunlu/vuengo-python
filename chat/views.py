@@ -74,7 +74,9 @@ class MyChatSessionsView(APIView):
         """create a new chat session."""
         ChatSessions = ChatSession.objects.filter(
             Q(creator=request.user) | Q(invited_user=request.user))
+
         ChatSerializers = ChatSessionSerializers(ChatSessions, many=True)
+
         Chats = []
         for Chat in ChatSerializers.data:
             messageObject = ChatSessionMessage.objects.filter(
@@ -134,6 +136,8 @@ class ChatSessionMessageView(generics.GenericAPIView):
 
 
 class MessageReceived(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
     def put(self, request, *args, **kwargs):
         channels.Received(request.data['chat_session'], request.data['sender'])
         messages = ChatSessionMessage.objects.filter(
@@ -145,6 +149,8 @@ class MessageReceived(APIView):
 
 
 class MessageSeen(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
     def put(self, request, *args, **kwargs):
         channels.Seen(request.data['chat_session'], request.data['sender'])
 
@@ -154,6 +160,15 @@ class MessageSeen(APIView):
             message.received = True
             message.seen = True
             message.save()
+        return Response('success', status=status.HTTP_201_CREATED)
+
+
+class VideoChat(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        channels.Video(
+            request.data['uri'], request.data['userId'], request.data['peerId'])
         return Response('success', status=status.HTTP_201_CREATED)
 
 

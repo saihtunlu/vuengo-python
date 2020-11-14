@@ -5,7 +5,8 @@ from rest_framework import generics, pagination
 from rest_framework.response import Response
 from .serializers import (PostSerializers, LikeSerializers,
                           CommentSerializers, CommentRepliesSerializers, CommentLikeSerializers)
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+# from .permissions import IsStaff
 from rest_framework.decorators import api_view
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import APIView
@@ -15,7 +16,7 @@ from django.core.mail import send_mail
 
 
 class PostsView(generics.ListAPIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = [IsAuthenticated]
     queryset = Post.objects.order_by('created_at').reverse()
     serializer_class = PostSerializers
     pagination_class = pagination.PageNumberPagination

@@ -12,4 +12,5 @@ urlpatterns = [
     path('received/', views.MessageReceived.as_view()),
     path('seen/', views.MessageSeen.as_view()),
     path('chats/<uri>/messages/', views.ChatSessionMessageView.as_view()),
+    path('start-video-chat/', views.VideoChat.as_view()),
 ]

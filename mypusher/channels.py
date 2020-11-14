@@ -14,3 +14,8 @@ def Received(chat_session, sender):
 def Seen(chat_session, sender):
     pusher_client.trigger('chat'+str(sender), 'Seen'+str(sender),
                           {'chat_session': chat_session})
+
+
+def Video(uri, userId, peerId):
+    pusher_client.trigger("video-chat-" + uri, 'client-user-id-'+str(userId),
+                          {'userId': userId, "peerId": peerId})
